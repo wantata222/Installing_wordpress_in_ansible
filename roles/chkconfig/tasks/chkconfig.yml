@@ -1,0 +1,8 @@
+- name: "common chkconfig( all server )"
+  service: name={{ item.name }} enabled={{ item.chkconfig }} state={{ item.s }}
+  with_items:
+    - { name: 'acpid', chkconfig: 'no', s: 'stopped' }
+    - { name: 'irqbalance', chkconfig: 'no', s: 'stopped' }
+    - { name: 'postfix', chkconfig: 'no', s: 'stopped' }
+    - { name: 'ip6tables', chkconfig: 'no', s: 'stopped' }
+

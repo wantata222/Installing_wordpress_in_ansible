@@ -1,0 +1,8 @@
+- hosts: PROD
+  user: hogehoge111
+  sudo: yes
+  roles:
+      - roles/chkconfig
+      - roles/nginx
+      - roles/mysql
+      - roles/wordpress

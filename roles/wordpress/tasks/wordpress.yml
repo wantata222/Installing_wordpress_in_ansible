@@ -1,0 +1,28 @@
+- name: "install wget package"
+  yum: name=wget  state=latest
+
+- name: "wordpress.tar.gz file exist check"
+  action: command chdir=/var/www [ -e wordpress-4.0-ja.tar.gz ]
+  register: result
+  ignore_errors: True
+
+- name: "wordpress.tar.gz download"
+  get_url: url="https://ja.wordpress.org/wordpress-4.0-ja.tar.gz" dest=/var/www
+  when: result|failed
+
+- name: "extract the wordpress-4.0-ja.tar.gz"
+  command: tar xvzf wordpress-4.0-ja.tar.gz chdir=/var/www
+  when: result|failed
+
+- name: "chown wordpress directory"
+  command: chdir=/var/www chown -R nginx. wordpress
+
+- name: "wp-config-sample.php -> wp-config.php"
+  command: chdir=/var/www/wordpress cp wp-config-sample.php wp-config.php
+
+- name: "replace /var/www/wordpress/wp-config.php"
+  replace: dest=/var/www/wordpress/wp-config.php regexp={{ item.reg }} replace={{ item.rep }}
+  with_items:
+      - { reg: database_name_here, rep: "{{ mysql_wordpress_dbname }}" }
+      - { reg: username_here, rep: "{{ mysql_wordpress_dbuser }}" }
+      - { reg: password_here, rep: "{{ mysql_wordpress_password }}" }

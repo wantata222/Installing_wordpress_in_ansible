@@ -1,0 +1,19 @@
+- name: "upgrade all packages"
+  yum: name=* state=latest
+
+- name: install nginx rpm from a remote repo
+  yum: name=http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm state=present
+
+- name: "install nginx"
+  yum: name={{ item.name }} state=latest 
+  with_items:
+    - { name: 'nginx' }
+
+- name: "copy nginx default.conf for wordpress"
+  copy: src=default.conf dest=/etc/nginx/conf.d/default.conf owner=root group=root backup=yes
+
+- name:  "nginx chkconfig & started"
+  service: name={{ item.name }} enabled={{ item.chkconfig }} state={{ item.s }}
+  with_items:
+    - { name: 'nginx', chkconfig: 'yes', s: 'started' }
+

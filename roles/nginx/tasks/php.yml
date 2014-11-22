@@ -1,0 +1,22 @@
+- name: "upgrade all packages"
+  yum: name=* state=latest
+
+- name: "install php & modules"
+  yum: name={{ item.name }} state=latest 
+  with_items:
+    - { name: 'php' }
+    - { name: 'php-fpm' }
+    - { name: 'php-mysql' }
+    - { name: 'php-mbstring' }
+
+- name: "replace /etc/php-fpm.d/www.conf"
+  replace: dest=/etc/php-fpm.d/www.conf regexp='= apache$' replace='= nginx'
+
+- name: "/var/lib/php/session owner cheange"
+  file: path=/var/lib/php/session state=directory owner=nginx group=nginx
+
+- name:  "php-fpm chkconfig & started"
+  service: name={{ item.name }} enabled={{ item.chkconfig }} state={{ item.s }}
+  with_items:
+      - { name: 'php-fpm', chkconfig: 'yes', s: 'started' }
+
